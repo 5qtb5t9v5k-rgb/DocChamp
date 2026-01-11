@@ -84,8 +84,10 @@ git push -u origin main
 - Varmista että `app.py` on pääsovellus
 
 ### Tesseract ei toimi
-- Streamlit Cloudissa Tesseract pitäisi olla saatavilla
-- Jos ei toimi, tarkista virhelokit
+- Streamlit Cloudissa Tesseract asennetaan automaattisesti `packages.txt`-tiedoston kautta
+- Tiedosto sisältää: `tesseract-ocr` ja `tesseract-ocr-fin`
+- Jos ei toimi, tarkista virhelokit Streamlit Cloud -konsolissa
+- Varmista että `packages.txt` on repositoriossa
 
 ## Tärkeää
 

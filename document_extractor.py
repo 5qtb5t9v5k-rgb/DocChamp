@@ -18,11 +18,19 @@ Funktiot:
 - detect_and_crop_receipt(): Automaattinen kuitin tunnistus
 """
 import io
+import os
 from typing import Union, Optional, Tuple
 import pdfplumber
 from PIL import Image, ImageEnhance, ImageOps
 import pytesseract
 import numpy as np
+
+# Streamlit Cloud: Aseta Tesseract OCR:n polku jos se löytyy
+# Tesseract asennetaan packages.txt:n kautta, mutta polku voi olla eri
+if os.path.exists('/usr/bin/tesseract'):
+    pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+elif os.path.exists('/usr/local/bin/tesseract'):
+    pytesseract.pytesseract.tesseract_cmd = '/usr/local/bin/tesseract'
 
 # OpenCV on valinnainen - jos sitä ei ole, käytetään koko kuvaa
 try:
