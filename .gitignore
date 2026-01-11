@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Ympäristömuuttujat
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Testitiedostot (eivät kuulu julkaisuun)
+testi*.jpeg
+testi*.png
+IMG_*.jpeg
+*.pdf
+!requirements.txt
+
+# OS
+Thumbs.db
+*.log
