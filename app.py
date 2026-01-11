@@ -7,7 +7,7 @@ tietojen erottelun.
 
 Päämoduulit:
 - document_extractor: Dokumenttien tekstin erottelu (PDF, OCR)
-- ai_service: AI-palveluiden abstraktio (OpenAI, Ollama)
+- ai_service: AI-palveluiden abstraktio (OpenAI)
 """
 import streamlit as st
 from document_extractor import extract_text
@@ -52,26 +52,27 @@ if "purchase_analysis" not in st.session_state:
     st.session_state.purchase_analysis = None
 
 
-def initialize_ai_service(service_type: str, api_key: str = None, model: str = None, temperature: float = 0.2) -> AIService:
-    """Alusta AI-palvelu."""
+def initialize_ai_service(model: str = None, temperature: float = 0.2) -> AIService:
+    """Alusta OpenAI-palvelu Streamlit Secretsista tai ympäristömuuttujista."""
     try:
-        if service_type == "openai":
-            if not api_key:
-                api_key = os.getenv("OPENAI_API_KEY")
-            if not api_key:
-                st.error("OpenAI API-avain puuttuu. Syötä se sidebarissa tai .env-tiedostoon.")
-                return None
-            return create_ai_service("openai", api_key=api_key, model=model or "gpt-4o-mini", temperature=temperature)
-        elif service_type == "ollama":
-            try:
-                return create_ai_service("ollama", model=model or "llama3.2", temperature=temperature)
-            except Exception as e:
-                error_msg = str(e)
-                if "ei saada yhteyttä" in error_msg or "Connection" in error_msg or "Failed to connect" in error_msg:
-                    st.error(f"⚠️ Ollama ei ole käytettävissä.\n\n{error_msg}\n\n💡 **Vinkki:** Voit käyttää OpenAI:ta sen sijaan. Valitse 'OpenAI' yllä ja syötä API-avain.")
-                else:
-                    st.error(f"Virhe Ollama-palvelun alustamisessa: {error_msg}")
-                return None
+        # Hae API-avain Streamlit Secretsista (Streamlit Cloud) tai ympäristömuuttujista
+        api_key = None
+        try:
+            # Yritä lukea Streamlit Secretsista (Streamlit Cloud)
+            if hasattr(st, 'secrets') and 'OPENAI_API_KEY' in st.secrets:
+                api_key = st.secrets['OPENAI_API_KEY']
+        except Exception:
+            pass
+        
+        # Jos ei löytynyt Secretsista, kokeile ympäristömuuttujaa
+        if not api_key:
+            api_key = os.getenv("OPENAI_API_KEY")
+        
+        if not api_key:
+            st.error("⚠️ OpenAI API-avain puuttuu. Aseta se Streamlit Cloud -secrets-kohtaan tai .env-tiedostoon.")
+            return None
+        
+        return create_ai_service("openai", api_key=api_key, model=model or "gpt-4o", temperature=temperature)
     except Exception as e:
         st.error(f"Virhe AI-palvelun alustamisessa: {str(e)}")
         return None
@@ -241,38 +242,15 @@ def extract_json_from_text(text: str) -> str:
 with st.sidebar:
     st.title("⚙️ Asetukset")
     
-    # AI-palvelun valinta
-    service_type = st.radio(
-        "Valitse AI-palvelu:",
-        ["OpenAI", "Ollama"],
-        help="OpenAI vaatii API-avaimen, Ollama vaatii paikallisen asennuksen"
-    )
-    
-    # Näytä infoboxi Ollamalle
-    if service_type == "Ollama":
-        st.info("ℹ️ **Ollama vaatii erillisen asennuksen.**\n\n1. Lataa Ollama: https://ollama.com/download\n2. Asenna malli: `ollama pull llama3.2`\n3. Käynnistä Ollama-palvelin\n\n💡 **Vinkki:** Jos Ollama ei ole asennettuna, käytä OpenAI:ta sen sijaan.")
-    
-    api_key = None
-    if service_type == "OpenAI":
-        api_key = st.text_input(
-            "OpenAI API-avain:",
-            type="password",
-            help="Syötä API-avain tai aseta se .env-tiedostoon OPENAI_API_KEY-muuttujaan"
-        )
+    st.markdown("**AI-palvelu:** OpenAI")
     
     # Mallin valinta
-    if service_type == "OpenAI":
-        model = st.selectbox(
-            "Malli:",
-            ["gpt-4o-mini", "gpt-4o"],
-            index=0
-        )
-    else:
-        model = st.text_input(
-            "Ollama-malli:",
-            value="llama3.2",
-            help="Syötä Ollama-mallin nimi (esim. llama3.2, mistral, jne.)"
-        )
+    model = st.selectbox(
+        "Malli:",
+        ["gpt-4o", "gpt-4o-mini"],
+        index=0,  # gpt-4o oletuksena
+        help="Valitse OpenAI-malli"
+    )
     
     # Temperature-parametri
     temperature = st.slider(
@@ -284,12 +262,41 @@ with st.sidebar:
         help="Matala (0.1-0.3) = faktapohjainen, luotettava. Korkea (0.6-0.9) = luova, ideointi. Oletus: 0.2 (dokumentti-QA)"
     )
     
-    # Alusta AI-palvelu
-    if st.button("Alusta AI-palvelu"):
-        service = initialize_ai_service(service_type.lower(), api_key, model, temperature)
-        if service:
-            st.session_state.ai_service = service
-            st.success("AI-palvelu alustettu onnistuneesti!")
+    # Automaattinen alustus jos API-avain löytyy
+    if st.session_state.ai_service is None:
+        # Yritä alustaa automaattisesti
+        try:
+            # Tarkista onko API-avain saatavilla
+            api_key_available = False
+            try:
+                if hasattr(st, 'secrets') and 'OPENAI_API_KEY' in st.secrets:
+                    api_key_available = True
+            except Exception:
+                pass
+            
+            if not api_key_available:
+                api_key_available = bool(os.getenv("OPENAI_API_KEY"))
+            
+            if api_key_available:
+                service = initialize_ai_service(model, temperature)
+                if service:
+                    st.session_state.ai_service = service
+                    st.success("✅ AI-palvelu alustettu automaattisesti!")
+            else:
+                st.warning("⚠️ OpenAI API-avain puuttuu. Aseta se Streamlit Cloud -secrets-kohtaan.")
+        except Exception as e:
+            st.warning(f"⚠️ AI-palvelun automaattinen alustus epäonnistui: {str(e)}")
+    
+    # Manuaalinen alustusnappi (jos automaattinen ei toiminut)
+    if st.session_state.ai_service is None:
+        if st.button("🔄 Alusta AI-palvelu"):
+            service = initialize_ai_service(model, temperature)
+            if service:
+                st.session_state.ai_service = service
+                st.success("✅ AI-palvelu alustettu onnistuneesti!")
+                st.rerun()
+    else:
+        st.success("✅ AI-palvelu on käytössä")
     
     st.divider()
     
@@ -331,10 +338,9 @@ if st.session_state.document_text is None:
     st.info("👈 Lataa dokumentti sidebarista aloittaaksesi.")
     st.markdown("""
     ### Miten käyttää:
-    1. Valitse AI-palvelu (OpenAI tai Ollama) sidebarista
-    2. Syötä API-avain (jos OpenAI) ja alusta palvelu
-    3. Lataa PDF- tai kuvatiedosto
-    4. Aloita keskustelu dokumentin sisällöstä!
+    1. AI-palvelu (OpenAI) alustetaan automaattisesti jos API-avain on asetettu
+    2. Lataa PDF- tai kuvatiedosto sidebarista
+    3. Aloita keskustelu dokumentin sisällöstä!
     """)
 else:
     # Näytä dokumentin tiedot
