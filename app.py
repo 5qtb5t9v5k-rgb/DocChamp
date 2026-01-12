@@ -252,15 +252,8 @@ with st.sidebar:
         help="Valitse OpenAI-malli"
     )
     
-    # Temperature-parametri
-    temperature = st.slider(
-        "Temperature (luovuus):",
-        min_value=0.0,
-        max_value=1.0,
-        value=0.2,
-        step=0.1,
-        help="Matala (0.1-0.3) = faktapohjainen, luotettava. Korkea (0.6-0.9) = luova, ideointi. Oletus: 0.2 (dokumentti-QA)"
-    )
+    # Temperature on vakio 0.2 (faktapohjainen dokumentti-QA)
+    temperature = 0.2
     
     # Automaattinen alustus jos API-avain löytyy
     if st.session_state.ai_service is None:
@@ -331,16 +324,20 @@ with st.sidebar:
 
 # Pääalue
 st.title("📄 DocChamp")
-st.markdown("Lataa dokumentti ja keskustele sen sisällöstä AI:n kanssa!")
+st.markdown("**DocChamp - Kuittien mestari**")
+st.markdown("Lataa PDF tai kuva ja keskustele sisällöstä — kuiteista saat myös rakenteisen yhteenvedon ja ostoanalyysin.")
 
 # Tarkista, onko dokumentti käsitelty
 if st.session_state.document_text is None:
-    st.info("👈 Lataa dokumentti sidebarista aloittaaksesi.")
+    st.info("👈 Aloita lataamalla dokumentti sivupalkista.")
     st.markdown("""
-    ### Miten käyttää:
-    1. AI-palvelu (OpenAI) alustetaan automaattisesti jos API-avain on asetettu
-    2. Lataa PDF- tai kuvatiedosto sidebarista
-    3. Aloita keskustelu dokumentin sisällöstä!
+    ### Näin se toimii:
+    1. **Lataa dokumentti** (PDF / kuva)
+    2. **DocChamp poimii tekstin** (OCR tarvittaessa)
+    3. **Valitse mitä haluat:**
+       - 💬 **Keskustele dokumentista** chatissa
+       - 🧾 **Poimi kuittitiedot** (summa, ALV, rivit)
+       - 🛒 **Ostoanalyysi:** kategorisointi + tiivis yhteenveto ostoksista
     """)
 else:
     # Näytä dokumentin tiedot
