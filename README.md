@@ -2,8 +2,6 @@
 
 **DocChamp** on tekoälypohjainen dokumenttianalyysi-sovellus, joka yhdistää OCR-tekniikan, kuvan esikäsittelyn ja moderneja kielimalleja tarjotakseen tehokkaan ratkaisun dokumenttien analysointiin ja tietojen erotteluun.
 
-![CI](https://github.com/5qtb5t9v5k-rgb/DocChamp/workflows/CI/badge.svg)
-
 ## Yleiskuvaus
 
 DocChamp on Streamlit-pohjainen web-sovellus, joka mahdollistaa:
@@ -270,68 +268,6 @@ liitealy/
 1. Lisää tunnistus `extract_text()` -funktioon
 2. Toteuta erottelufunktio (esim. `extract_from_docx()`)
 3. Päivitä `requirements.txt` tarvittaessa
-
-## CI/CD ja Automaatio
-
-DocChamp käyttää GitHub Actions -workflowta automaattiselle testaamiselle ja CI/CD:lle.
-
-### GitHub Actions Workflowt
-
-#### Continuous Integration (CI)
-- **Käynnistyy**: Automaattisesti kun pushataan `main` tai `develop` -branchiin tai luodaan Pull Request
-- **Testaa**: Python-versioilla 3.8, 3.9, 3.10, 3.11
-- **Tarkistaa**:
-  - Koodin laatu (flake8, black)
-  - Importit toimivat
-  - Python-tiedostot kääntyvät
-  - Tesseract OCR on saatavilla
-
-#### Deployment Verification
-- **Käynnistyy**: Automaattisesti kun pushataan `main` -branchiin
-- **Varmistaa**: Sovellus on valmis deployattavaksi Streamlit Cloudiin
-
-#### Dependabot
-- **Päivittää**: Python-riippuvuudet automaattisesti viikoittain
-- **Luo**: Pull Requestit päivityksistä
-
-### Pull Request -prosessi
-
-1. **Luo uusi branch:**
-   ```bash
-   git checkout -b feature/uusi-ominaisuus
-   ```
-
-2. **Tee muutokset ja commitoi:**
-   ```bash
-   git add .
-   git commit -m "feat: lisää uusi ominaisuus"
-   ```
-
-3. **Pushaa GitHubiin:**
-   ```bash
-   git push origin feature/uusi-ominaisuus
-   ```
-
-4. **Luo Pull Request:**
-   - Mene [GitHub-repositorioon](https://github.com/5qtb5t9v5k-rgb/DocChamp)
-   - Klikkaa "New Pull Request"
-   - Täytä PR-template
-   - Klikkaa "Create Pull Request"
-
-5. **CI ajaa automaattisesti:**
-   - GitHub Actions ajaa testit
-   - Näet tulokset PR:ssä
-   - Vihreä tikku ✅ = kaikki OK
-   - Punainen X ❌ = korjaa virheet
-
-### Workflow-tiedostot
-
-- `.github/workflows/ci.yml` - CI-workflow
-- `.github/workflows/deploy.yml` - Deploy-verifiointi
-- `.github/dependabot.yml` - Automaattiset päivitykset
-- `.github/pull_request_template.md` - PR-template
-
-Lisätietoja: [.github/README.md](.github/README.md)
 
 ## Julkaisu Streamlit Cloudissa
 
