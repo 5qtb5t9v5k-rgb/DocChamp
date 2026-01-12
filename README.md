@@ -1,6 +1,12 @@
 # DocChamp - Kuittien mestari
 
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 **DocChamp** on tekoälypohjainen dokumenttianalyysi-sovellus, joka yhdistää OCR-tekniikan, kuvan esikäsittelyn ja moderneja kielimalleja tarjotakseen tehokkaan ratkaisun dokumenttien analysointiin ja tietojen erotteluun.
+
+> 🎯 **Keskittyy kuiteihin**: Automaattinen kuittitietojen erottelu, strukturoitu JSON-muoto ja semanttinen ostosanalyysi.
 
 ## Yleiskuvaus
 
@@ -14,16 +20,63 @@ Sovellus on suunniteltu modulaarisesti ja tukee useita AI-palveluntarjoajia, mik
 
 ## Arkkitehtuuri
 
-DocChamp koostuu kolmesta päämoduulista:
+DocChamp noudattaa modulaarista arkkitehtuuria, joka erottaa dokumenttien käsittelyn, AI-palvelut ja käyttöliittymän selkeästi toisistaan. Tämä mahdollistaa helpon laajentamisen ja testaamisen.
 
-### 1. Dokumenttien käsittely (`document_extractor.py`)
+### Arkkitehtuurikaavio
+
+```mermaid
+graph TB
+    subgraph "Käyttöliittymä"
+        UI[Streamlit UI<br/>app.py]
+    end
+    
+    subgraph "Dokumenttien käsittely"
+        DE[Document Extractor<br/>document_extractor.py]
+        PDF[PDF Processing<br/>pdfplumber]
+        OCR[OCR Processing<br/>Tesseract]
+        IMG[Image Preprocessing<br/>OpenCV/PIL]
+    end
+    
+    subgraph "AI-palvelut"
+        AI[AIService Interface]
+        OPENAI[OpenAI Service<br/>GPT-4o/GPT-4o-mini]
+        OLLAMA[Ollama Service<br/>llama3.2]
+    end
+    
+    subgraph "Toiminnot"
+        CHAT[Chat & Q&A]
+        EXTRACT[Receipt Extraction]
+        ANALYZE[Purchase Analysis]
+    end
+    
+    UI --> DE
+    DE --> PDF
+    DE --> OCR
+    DE --> IMG
+    
+    UI --> AI
+    AI --> OPENAI
+    AI --> OLLAMA
+    
+    AI --> CHAT
+    AI --> EXTRACT
+    AI --> ANALYZE
+    
+    style UI fill:#e1f5ff
+    style AI fill:#fff4e1
+    style DE fill:#e8f5e9
+```
+
+### Moduulit
+
+#### 1. Dokumenttien käsittely (`document_extractor.py`)
 - **PDF-käsittely**: Käyttää `pdfplumber`-kirjastoa tekstin erotteluun
 - **OCR-käsittely**: Käyttää Tesseract OCR:ää kuvatiedostojen tekstin tunnistukseen
 - **Kuvan esikäsittely**: Automaattinen kontrastin ja terävyyden parannus OCR:n tarkkuuden optimoimiseksi
 - **Automaattinen kuitin rajaus**: OpenCV-pohjainen algoritmi, joka tunnistaa ja rajaa kuitin alueen kuvasta
 - **Manuaalinen rajaus**: Käyttäjäystävällinen slider-pohjainen rajaus-työkalu
 
-### 2. AI-palvelut (`ai_service.py`)
+#### 2. AI-palvelut (`ai_service.py`)
 - **Abstrakti rajapinta**: `AIService`-luokka määrittelee yhteisen rajapinnan kaikille AI-palveluille
 - **OpenAI-integraatio**: Tuki OpenAI:n GPT-malleille (gpt-4o-mini, gpt-4o)
 - **Ollama-integraatio**: Tuki paikallisille Ollama-malleille (esim. llama3.2)
@@ -32,11 +85,18 @@ DocChamp koostuu kolmesta päämoduulista:
   - Ostosten semanttinen analyysi ja kategorisointi
   - Dokumenttikeskustelu chat-tyylisellä käyttöliittymällä
 
-### 3. Käyttöliittymä (`app.py`)
+#### 3. Käyttöliittymä (`app.py`)
 - **Streamlit-pohjainen UI**: Moderni, responsiivinen web-käyttöliittymä
 - **Kaksisarakkeinen layout**: Chat-vasemmalla, dokumentti- ja kuittitiedot oikealla
 - **Reaaliaikainen esikatselu**: Kuvan rajaus päivittyy reaaliajassa sliderien mukaan
 - **Automaattinen laadun tarkistus**: Tunnistaa heikon OCR-laadun ja ehdottaa parannuksia
+
+### Tietovirta
+
+1. **Dokumentin lataus**: Käyttäjä lataa PDF:n tai kuvan → `document_extractor.py` käsittelee sen
+2. **Tekstin erottelu**: PDF-käsittely tai OCR tuottaa raakatekstin
+3. **AI-analyysi**: Teksti lähetetään AI-palvelulle (`ai_service.py`)
+4. **Tulosten esittely**: Streamlit UI näyttää tulokset käyttäjälle
 
 ## Ominaisuudet
 
@@ -56,6 +116,25 @@ DocChamp koostuu kolmesta päämoduulista:
 - ✅ **Automaattinen validointi**: Tarkistaa kuittitietojen loogisuuden (summat, ALV-erittely)
 - ⚠️ **Laadun seuranta**: Tunnistaa heikon OCR-laadun ja ehdottaa parannuksia
 - 🔄 **Automaattinen uudelleenkäsittely**: Suorittaa OCR:n ja erottelun uudelleen rajaamisen jälkeen
+
+## Quick Start
+
+```bash
+# 1. Kloonaa repositorio
+git clone https://github.com/5qtb5t9v5k-rgb/DocChamp.git
+cd DocChamp
+
+# 2. Asenna riippuvuudet
+pip install -r requirements.txt
+
+# 3. Asenna Tesseract OCR (macOS)
+brew install tesseract tesseract-lang
+
+# 4. Käynnistä sovellus
+streamlit run app.py
+```
+
+Sovellus avautuu automaattisesti selaimessa osoitteessa `http://localhost:8501`.
 
 ## Asennus
 
@@ -159,14 +238,22 @@ Sovellus avautuu selaimessa (yleensä `http://localhost:8501`).
 ### Tiedostorakenne
 
 ```
-liitealy/
+DocChamp/
 ├── app.py                    # Streamlit-sovellus (pääsovellus)
 ├── document_extractor.py     # Dokumenttien tekstin erottelu (PDF, OCR)
 ├── ai_service.py             # AI-palveluiden abstraktio (OpenAI, Ollama)
 ├── requirements.txt          # Python-riippuvuudet
-├── .env.example             # Esimerkki ympäristömuuttujille
-├── README.md                # Tämä tiedosto
-└── .gitignore               # Git-ignore tiedosto
+├── packages.txt              # Järjestelmäriippuvuudet (Tesseract OCR)
+├── .env.example              # Esimerkki ympäristömuuttujille
+├── README.md                 # Tämä tiedosto
+├── DEPLOY.md                 # Julkaisuohjeet Streamlit Cloudiin
+├── .gitignore                # Git-ignore tiedosto
+└── .github/
+    ├── workflows/            # GitHub Actions workflowt
+    │   ├── ci.yml           # Continuous Integration
+    │   └── deploy.yml       # Deployment verification
+    ├── dependabot.yml       # Automaattiset päivitykset
+    └── pull_request_template.md  # PR-template
 ```
 
 ### Moduulien kuvaus
@@ -325,13 +412,34 @@ liitealy/
 - Varmista että avain on oikein Streamlit Secrets -kohdassa
 - Tarkista että avain on voimassa
 
+## Teknologiat
+
+- **Python 3.8+**: Pääohjelmointikieli
+- **Streamlit**: Web-käyttöliittymä
+- **OpenAI API**: GPT-mallit dokumenttianalyysiin
+- **Ollama**: Paikalliset kielimallit (vapaaehtoinen)
+- **Tesseract OCR**: Kuvatiedostojen tekstin tunnistus
+- **pdfplumber**: PDF-tiedostojen käsittely
+- **OpenCV**: Kuvan esikäsittely ja kuitin tunnistus
+- **Pillow (PIL)**: Kuvankäsittely
+
+## Osallistuminen
+
+Olemme avoimia parannusehdotuksille ja kontribuutioille! Jos haluat osallistua:
+
+1. Forkkaa repositorio
+2. Luo uusi branch (`git checkout -b feature/oma-ominaisuus`)
+3. Commitoi muutokset (`git commit -m 'feat: lisää uusi ominaisuus'`)
+4. Pushaa branchiin (`git push origin feature/oma-ominaisuus`)
+5. Avaa Pull Request
+
 ## Lisenssi
 
 Tämä projekti on vapaasti käytettävissä.
 
 ## Tuki
 
-Jos kohtaat ongelmia tai sinulla on kysymyksiä, tarkista:
-1. Tämä dokumentaatio
-2. Koodin kommentit
-3. Virheilmoitukset sovelluksessa
+Jos kohtaat ongelmia tai sinulla on kysymyksiä:
+- Tarkista [Ongelmatilanteet](#ongelmatilanteet) -osion
+- Avaa [Issue](https://github.com/5qtb5t9v5k-rgb/DocChamp/issues) GitHubissa
+- Tarkista koodin kommentit ja dokumentaation

@@ -18,7 +18,8 @@
 Aja seuraavat komennot DocChamp-kansiossa:
 
 ```bash
-cd /Users/juhorissanen/Desktop/DocChamp
+# Siirry projektikansioon
+cd DocChamp
 
 # Alusta git (jos ei vielä tehty)
 git init
@@ -29,15 +30,15 @@ git add .gitignore README.md requirements.txt app.py ai_service.py document_extr
 # Commit
 git commit -m "Initial commit: DocChamp - AI-powered document analysis application"
 
-# Yhdistä GitHub-repositorioon (korvaa KAYTTAJANIMI omalla GitHub-käyttäjänimelläsi)
-git remote add origin https://github.com/KAYTTAJANIMI/docchamp.git
+# Yhdistä GitHub-repositorioon (korvaa YOUR_USERNAME omalla GitHub-käyttäjänimelläsi)
+git remote add origin https://github.com/YOUR_USERNAME/docchamp.git
 
 # Pushaa GitHubiin
 git branch -M main
 git push -u origin main
 ```
 
-**HUOM**: Korvaa `KAYTTAJANIMI` omalla GitHub-käyttäjänimelläsi.
+**HUOM**: Korvaa `YOUR_USERNAME` omalla GitHub-käyttäjänimelläsi.
 
 ## Vaihe 2: Streamlit Cloud -sovelluksen luominen
 
@@ -47,7 +48,7 @@ git push -u origin main
 2. Kirjaudu sisään GitHub-tililläsi
 3. Klikkaa "New app"
 4. Täytä tiedot:
-   - **Repository**: Valitse `KAYTTAJANIMI/docchamp`
+   - **Repository**: Valitse `YOUR_USERNAME/docchamp`
    - **Branch**: `main`
    - **Main file path**: `app.py`
 5. Klikkaa "Deploy"
@@ -76,7 +77,7 @@ git push -u origin main
 ### Git push epäonnistuu
 - Tarkista että olet kirjautunut GitHubiin: `gh auth status`
 - Tarkista että remote on oikein: `git remote -v`
-- Kokeile käyttää SSH:ta: `git remote set-url origin git@github.com:KAYTTAJANIMI/docchamp.git`
+- Kokeile käyttää SSH:ta: `git remote set-url origin git@github.com:YOUR_USERNAME/docchamp.git`
 
 ### Streamlit Cloud ei käynnisty
 - Tarkista että `requirements.txt` on oikein

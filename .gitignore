@@ -33,3 +33,7 @@ IMG_*.jpeg
 # OS
 Thumbs.db
 *.log
+
+# Deployment scripts (sisältävät henkilökohtaisia polkuja)
+*.sh
+!setup.sh
