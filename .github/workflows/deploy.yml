@@ -1,0 +1,48 @@
+name: Deploy to Streamlit Cloud
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Mahdollistaa manuaalisen käynnistyksen
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y tesseract-ocr tesseract-ocr-fin
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Verify Streamlit app
+      run: |
+        python -m py_compile app.py
+        python -c "import streamlit; print('Streamlit version:', streamlit.__version__)"
+        echo "✅ App verification passed"
+    
+    - name: Check for Streamlit Cloud deployment
+      run: |
+        echo "📝 Note: Streamlit Cloud deployment happens automatically when you connect"
+        echo "your GitHub repository to Streamlit Cloud. This workflow verifies"
+        echo "that the app is ready for deployment."
+        echo ""
+        echo "To deploy:"
+        echo "1. Go to https://share.streamlit.io"
+        echo "2. Click 'New app'"
+        echo "3. Select this repository"
+        echo "4. Set main file to: app.py"
+        echo "5. Add OPENAI_API_KEY to Secrets if needed"
