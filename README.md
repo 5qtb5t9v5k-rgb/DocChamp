@@ -1,8 +1,8 @@
-# DocChamp
-
-![CI](https://github.com/5qtb5t9v5k-rgb/DocChamp/workflows/CI/badge.svg)
+# DocChamp - Kuittien mestari
 
 **DocChamp** on tekoälypohjainen dokumenttianalyysi-sovellus, joka yhdistää OCR-tekniikan, kuvan esikäsittelyn ja moderneja kielimalleja tarjotakseen tehokkaan ratkaisun dokumenttien analysointiin ja tietojen erotteluun.
+
+![CI](https://github.com/5qtb5t9v5k-rgb/DocChamp/workflows/CI/badge.svg)
 
 ## Yleiskuvaus
 
@@ -323,11 +323,6 @@ DocChamp käyttää GitHub Actions -workflowta automaattiselle testaamiselle ja 
    - Näet tulokset PR:ssä
    - Vihreä tikku ✅ = kaikki OK
    - Punainen X ❌ = korjaa virheet
-
-### Status Badge
-
-Projektin CI-tila:
-![CI](https://github.com/5qtb5t9v5k-rgb/DocChamp/workflows/CI/badge.svg)
 
 ### Workflow-tiedostot
 
